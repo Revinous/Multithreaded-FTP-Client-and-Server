@@ -8,7 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public class AmpersandHandler extends Thread {
+public class AmpersandHandler implements Runnable {
 	
 	String[] commandAndValue;
 	String input = "";		
@@ -16,27 +16,26 @@ public class AmpersandHandler extends Thread {
 	ObjectInputStream inputStreamAmper = null;
 	Socket socket;
 	String commandId;
-	public AmpersandHandler(String input, Socket socket) {
+	public AmpersandHandler(String input, Socket socket) throws IOException {
 		this.input = input;
-		String[] commandAndValue = input.split(" ");
+		this.commandAndValue = input.split(" ");
 		this.socket = socket;
+		System.out.println(input);
+		
 	}
 	
-	@Override
 	public void run() {
 		try {
-			outputStreamAmper = new  ObjectOutputStream(socket.getOutputStream());
-			inputStreamAmper = new ObjectInputStream(socket.getInputStream());
-		
+			
+		outputStreamAmper = new  ObjectOutputStream(socket.getOutputStream());
+		//inputStreamAmper = new ObjectInputStream(socket.getInputStream());
 		switch(commandAndValue[0]) {
 		
 			case "get&"://client receives file from server
-				//1) Send Command to Server
-				outputStreamAmper.writeObject(input);
-				//2) Receive CommandId from Server
-				commandId = (String) inputStreamAmper.readObject();
-			
-				System.out.println(commandId);
+				
+				Thread.sleep(10000);
+				System.out.println(input);
+				System.out.println("in Get&Y");
 				break;
 	
 			case "put&"://client sends file to server
@@ -49,7 +48,7 @@ public class AmpersandHandler extends Thread {
 		}
 		
 		
-	} catch (ClassNotFoundException | IOException e) {
+	} catch (ClassNotFoundException | IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

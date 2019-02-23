@@ -64,10 +64,9 @@ public class Client {
 	
 				case "get&":
 				case "put&":
-					
-					ampersandHandlerThread = new AmpersandHandler(input, socket);
-					ampersandHandlerThread.start();
-					
+					AmpersandHandler runnable = new AmpersandHandler(input, socket);
+					Thread thread = new Thread(runnable,"thread");
+					thread.start();
 					break;
 					
 				case "terminate":
