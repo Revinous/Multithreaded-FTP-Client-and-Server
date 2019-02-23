@@ -25,10 +25,14 @@ public class Client {
 				
 			switch(commandAndValue[0]) {
 			
-				case "get"://client receidves file from server
+				case "get"://client receives file from server
+					//1) Send Command to Server
 					outputStream.writeObject(input);
-					byte[] arr = new byte[inputStream.readInt()];
+					//2) Receive CommandId from Server
+					String commandId = (String) inputStream.readObject();
+					System.out.println(commandId);
 					
+					byte[] arr = new byte[inputStream.readInt()];
 					FileOutputStream fos = new FileOutputStream(commandAndValue[1]);
 					BufferedOutputStream bos = new BufferedOutputStream(fos);
 					
@@ -41,7 +45,12 @@ public class Client {
 					break;
 		
 				case "put"://client sends file to server
+					//1) Send Command to Server
 					outputStream.writeObject(input);
+					//2) Receive CommandId from Server
+					commandId = (String) inputStream.readObject();
+					System.out.println(commandId);
+					
 					File myfile = new File(commandAndValue[1]);
 					arr = new byte[(int)myfile.length()];
 					BufferedInputStream br = new BufferedInputStream(new FileInputStream(myfile));
@@ -55,7 +64,8 @@ public class Client {
 	
 				case "get&":
 				case "put&":
-					ampersandHandlerThread = new AmpersandHandler(commandAndValue, socket);
+					
+					ampersandHandlerThread = new AmpersandHandler(input, socket);
 					ampersandHandlerThread.start();
 					
 					break;
@@ -65,14 +75,14 @@ public class Client {
 					Socket socketTerminate = new Socket("127.0.0.1", tPort);
 					ObjectOutputStream outputStreamTerminate = new  ObjectOutputStream(socketTerminate.getOutputStream());
 					outputStreamTerminate.writeObject("terminate");
-					
+					socketTerminate.close();
 					//also kill thread executing get& or put& and clear all garbage
 					
 					//..logic yet to be implemented
 				break;
 				default:
 					outputStream.writeObject(input);
-					String message = (String) inputStream.readObject();
+					 String message = (String) inputStream.readObject();
 					System.out.println(message);
 					if(message.equals("quit")) {
 						System.out.println("GoodBye!");
