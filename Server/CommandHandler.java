@@ -43,15 +43,14 @@ public class CommandHandler extends Thread {
 				}
 					
 				System.out.println("command recieved - > at client no ->"+clientNo + " - > " + command);
-				
-			
 				workingDirectory.concat("\\");
+				
 				switch(commandAndValue[0]) {
+				
 				case "get&":
 				case "get" : //Server send file to client
-					
 					outputStream.writeObject(String.valueOf(commandId++));
-				
+					
 					File myfile = new File(workingDirectory+"\\"+commandAndValue[1]);
 					byte[] arr = new byte[(int)myfile.length()];
 					BufferedInputStream br = new BufferedInputStream(new FileInputStream(myfile));
@@ -64,7 +63,7 @@ public class CommandHandler extends Thread {
 					break;
 				
 				case "put&":
-				case "put" ://Server recieves file from client
+					case "put" ://Server recieves file from client
 					outputStream.writeObject(String.valueOf(commandId++));
 					System.out.println("wait1");
 					arr = new byte[15000];
