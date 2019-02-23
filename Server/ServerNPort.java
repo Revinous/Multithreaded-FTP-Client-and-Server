@@ -5,17 +5,23 @@ import java.io.ObjectOutputStream;
 import java.lang.ClassNotFoundException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 
 public class ServerNPort extends Thread {
 
 	private static ServerSocket server;
 	static int count = 0;
 	static Socket socket = null;
+	 int processIdOffset;
 	int tPort;
-	public ServerNPort(int port, int tPort) throws IOException {
+	HashMap<Integer, Integer> processTable;
+	
+	public ServerNPort(int port, int tPort, HashMap<Integer, Integer> processTable) throws IOException {
 
 		server = new ServerSocket(port);//server
 		this.tPort = tPort;
+		this.processIdOffset = this.processIdOffset;
+		processTable = this.processTable;
 	}
 	@Override
 	public void run() {
@@ -29,7 +35,7 @@ public class ServerNPort extends Thread {
 			System.out.println("Client" + count +"connected");
 			CommandHandler thread = null;
 	
-			thread = new CommandHandler(socket, count, tPort);
+			thread = new CommandHandler(socket, count, tPort, processTable);
 			thread.start();
 	}
 	catch (ClassNotFoundException | IOException e) {

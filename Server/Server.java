@@ -1,7 +1,8 @@
 import java.io.IOException;
+import java.util.HashMap;
 
 public class Server {
-	public int[][] processTable = new int[512][512];
+	public static HashMap<Integer,Integer> processTable = new HashMap<>();
 	
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
@@ -10,7 +11,7 @@ public class Server {
 		
 		//Start thread to handle normal command at nPort
 		
-		ServerNPort nThread = new ServerNPort(nPort, tPort);
+		ServerNPort nThread = new ServerNPort(nPort, tPort, processTable);
 		nThread.start();
 		
 		//Start thread to handle terminate command at tPort

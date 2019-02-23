@@ -24,7 +24,7 @@ public class ServerTPort extends Thread {
 		 
 	while(true) {
 			 count++;
-			 
+			 System.out.println("--------------------------------------------");
 			 System.out.println("Waiting for client terminate command request");
 			try {
 				socket = server.accept();
