@@ -64,6 +64,11 @@ public class Client {
 	
 				case "get&":
 				case "put&":
+					//1) Send Command to Server
+					outputStream.writeObject(input);
+					//2) Receive CommandId from Server
+					commandId = (String) inputStream.readObject();
+					System.out.println(commandId);
 					AmpersandHandler runnable = new AmpersandHandler(input, socket);
 					Thread thread = new Thread(runnable,"thread");
 					thread.start();
