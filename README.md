@@ -1,5 +1,18 @@
 # distributed-system-2
 Assignment 2
+
+### Remaning
+1) get& put&
+2) Mutual Exclusion
+3) Create table for termniate
+4) Implementation of clearing garbage
+
+### Completed
+1) Created Server.java which spawns ServerTPort and ServerNPort
+2) ServerNPort accepts commands and execute them
+3) created AmperHandler thread that runs in background in client when get& and put& 
+4) on terminate command, client relaying with ServerTPort
+
 ## Installation
 
 1) Create two projects in eclipse (Server and Client)
