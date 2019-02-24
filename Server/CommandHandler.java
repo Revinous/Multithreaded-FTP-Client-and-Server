@@ -48,6 +48,11 @@ public class CommandHandler extends Thread {
 				switch(commandAndValue[0]) {
 				
 				case "get&":
+					outputStream.writeObject(String.valueOf(commandId++));
+					
+					System.out.println("Command Recieved get&");
+					break;
+					
 				case "get" : //Server send file to client
 					outputStream.writeObject(String.valueOf(commandId++));
 					
