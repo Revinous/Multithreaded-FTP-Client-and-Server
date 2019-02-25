@@ -5,17 +5,19 @@ import java.io.ObjectOutputStream;
 import java.lang.ClassNotFoundException;
 import java.net.ServerSocket;
 import java.net.Socket;
-
+import java.util.Arrays;
+import java.util.HashMap;
 public class ServerTPort extends Thread {
 
 	private static ServerSocket server;
 	static int count = 0;
 	static int[][] commands = new int[512][512];
-	
+   HashMap<Integer,String> processTable;
 	static Socket socket = null;
 	
-	public ServerTPort(int port) throws IOException {
-
+	public ServerTPort(int port, HashMap<Integer,String> processTable ) throws IOException {
+    
+    this.processTable = processTable;
 		server = new ServerSocket(port);//server
 		
 	}
@@ -25,13 +27,15 @@ public class ServerTPort extends Thread {
 	while(true) {
 			 count++;
 			 System.out.println("--------------------------------------------");
-			 System.out.println("Waiting for client terminate command request");
+			 
 			try {
 				socket = server.accept();
 				ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
-			
-				System.out.println("Connected!" + 	inputStream.readObject());
+			  String commandID = 	(String)inputStream.readObject();
+				System.out.println("Terminating Command with ID : " + commandID);
 				
+         System.out.println(processTable.get(1));
+        System.out.println(processTable.get(Integer.parseInt(commandID)));
 				
 				
 			} catch (IOException e) {

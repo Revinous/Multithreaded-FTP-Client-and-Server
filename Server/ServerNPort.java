@@ -9,19 +9,19 @@ import java.util.HashMap;
 
 public class ServerNPort extends Thread {
 
-	private static ServerSocket server;
-	static int count = 0;
-	static Socket socket = null;
+	 private static ServerSocket server;
+	 static int count = 0;
+   static Socket socket = null;
 	 int processIdOffset;
-	int tPort;
-	HashMap<Integer, Integer> processTable;
+   int tPort;
+   HashMap<Integer,String> processTable;
 	
-	public ServerNPort(int port, int tPort, HashMap<Integer, Integer> processTable) throws IOException {
+	public ServerNPort(int port, int tPort, HashMap<Integer, String> processTable) throws IOException {
 
 		server = new ServerSocket(port);//server
 		this.tPort = tPort;
 		this.processIdOffset = this.processIdOffset;
-		processTable = this.processTable;
+		this.processTable = processTable;
 	}
 	@Override
 	public void run() {

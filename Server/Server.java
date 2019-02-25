@@ -2,10 +2,11 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class Server {
-	public static HashMap<Integer,Integer> processTable = new HashMap<>();
+	public static HashMap<Integer,String> processTable;
 	
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
+   processTable = new HashMap<Integer,String>();
 		int nPort = Integer.parseInt(args[0]);
 		int tPort = Integer.parseInt(args[1]);
 		
@@ -16,7 +17,7 @@ public class Server {
 		
 		//Start thread to handle terminate command at tPort
 		
-		ServerTPort tThread = new ServerTPort(tPort);
+		ServerTPort tThread = new ServerTPort(tPort, processTable);
 		tThread.start();
 		
 	}
