@@ -8,8 +8,8 @@ public class Client {
 		Socket socket = null;
 		ObjectOutputStream outputStream = null;
 		ObjectInputStream inputStream = null;
-		int nPort = 9876;
-		int tPort = 9877;
+		int nPort = Integer.parseInt(args[0]);
+		int tPort = Integer.parseInt(args[1]);
 		Scanner s = new Scanner(System.in);
 		String currentWorkingDirectory = "myftp>";
 		socket = new Socket("127.0.0.1", nPort);		
@@ -64,16 +64,13 @@ public class Client {
 	
 				case "get&":
 				case "put&":
-					//1) Send Command to Server
-					outputStream.writeObject(input);
-					//2) Receive CommandId from Server
-					commandId = (String) inputStream.readObject();
-					System.out.println(commandId);
-					AmpersandHandler runnable = new AmpersandHandler(input, socket);
+					AmpersandHandler runnable = new AmpersandHandler(input, nPort);
 					Thread thread = new Thread(runnable,"thread");
 					thread.start();
+          Thread.sleep(100);
 					break;
 					
+                              
 				case "terminate":
 					//Relay on tPort
 					Socket socketTerminate = new Socket("127.0.0.1", tPort);
