@@ -9,14 +9,14 @@ public class CommandHandler extends Thread {
 	 String workingDirectory;
 	 int tPort;
 	 int commandId;
-	 HashMap<Integer, Integer> processTable;
+  HashMap<Integer,String> processTable;
 	
-	public CommandHandler(Socket inSocket, int count, int tPort, HashMap<Integer, Integer> processTable) throws ClassNotFoundException, IOException {
+	public CommandHandler(Socket inSocket, int count, int tPort, HashMap<Integer, String> processTable) throws ClassNotFoundException, IOException {
 		socket = inSocket;
 		clientNo = count;
 		this.tPort = tPort;
 		this.processTable = processTable;
-		commandId = (int)(Math.random() * 100 * count + 1);
+		commandId = 1;
 		workingDirectory = System.getProperty("user.dir");//curemt workimg dirctory
 	}
 	@Override
@@ -47,13 +47,14 @@ public class CommandHandler extends Thread {
 				switch(commandAndValue[0]) {
 				
 				case "get" : //Server send file to client
+          processTable.put(commandId, "Running" + command); //1 is running
           outputStream.writeObject(String.valueOf(commandId++));
 					File myfile = new File(workingDirectory+"/"+commandAndValue[1]);
 					byte[] arr = new byte[(int)myfile.length()];
 					
 					BufferedInputStream br = new BufferedInputStream(new FileInputStream(myfile));
 					br.read(arr,0,arr.length);
-					System.out.println(arr.length);
+				//	System.out.println(arr.length);
 					outputStream.writeInt((int)myfile.length());
 					outputStream.write(arr,0,arr.length);	
 					
@@ -62,8 +63,9 @@ public class CommandHandler extends Thread {
 					break;
 					
 				case "put" ://Server recieves file from client
-        outputStream.writeObject(String.valueOf(commandId++));
-					System.out.println("wait1");
+          processTable.put(commandId, "Running" + command); //1 is running
+          outputStream.writeObject(String.valueOf(commandId++));
+				//	System.out.println("wait1");
 					arr = new byte[inputStream.readInt()];
 					
 					FileOutputStream fos = new FileOutputStream(commandAndValue[1]);
