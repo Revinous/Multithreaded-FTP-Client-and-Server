@@ -27,11 +27,9 @@ public class CommandHandler extends Thread {
 				ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
 				
 			while(true) {
-			
 				//get command(request) from client
 				String command = (String) inputStream.readObject();
-				
-				
+		
 				String[] commandAndValue = command.split(" ");
 				if(commandAndValue[0].equals("quit")) {
 					
@@ -43,46 +41,36 @@ public class CommandHandler extends Thread {
 				}
 					
 				System.out.println("command recieved - > at client no ->"+clientNo + " - > " + command);
-				workingDirectory.concat("\\");
 				
+			
+				workingDirectory.concat("/");
 				switch(commandAndValue[0]) {
 				
-				case "get&":
-					outputStream.writeObject(String.valueOf(commandId++));
-					
-					System.out.println("Command Recieved get&");
-					break;
-					
 				case "get" : //Server send file to client
-					outputStream.writeObject(String.valueOf(commandId++));
-					
-					File myfile = new File(workingDirectory+"\\"+commandAndValue[1]);
+          outputStream.writeObject(String.valueOf(commandId++));
+					File myfile = new File(workingDirectory+"/"+commandAndValue[1]);
 					byte[] arr = new byte[(int)myfile.length()];
+					
 					BufferedInputStream br = new BufferedInputStream(new FileInputStream(myfile));
 					br.read(arr,0,arr.length);
-					//System.out.println(arr.length);
+					System.out.println(arr.length);
+					outputStream.writeInt((int)myfile.length());
 					outputStream.write(arr,0,arr.length);	
 					
 					outputStream.flush();
 					br.close();
 					break;
-				
-				case "put&":
-					case "put" ://Server recieves file from client
-					outputStream.writeObject(String.valueOf(commandId++));
+					
+				case "put" ://Server recieves file from client
+        outputStream.writeObject(String.valueOf(commandId++));
 					System.out.println("wait1");
-					arr = new byte[15000];
+					arr = new byte[inputStream.readInt()];
 					
 					FileOutputStream fos = new FileOutputStream(commandAndValue[1]);
 					BufferedOutputStream bos = new BufferedOutputStream(fos);
 					
 					inputStream.read(arr,0,arr.length);
-					int count = 0;
-					while(arr[count] > 0)
-						bos.write(arr,0,count++);
-					
-					//System.out.println(Arrays.toString(arr));
-					
+					bos.write(arr,0,arr.length);
 					bos.close();
 					fos.close();
 					break;
@@ -90,11 +78,9 @@ public class CommandHandler extends Thread {
 				case "delete":
 					 File file = new File(commandAndValue[1]);
 				        if(file.delete()){
-				        	System.out.println(commandAndValue[1]+ " File deleted");
+				        	outputStream.writeObject(commandAndValue[1]+ " File deleted");
 				        }else 
-				        	System.out.println("File" + commandAndValue[1] + "doesn't exists in project root directory");
-				        	
-				   
+				        	outputStream.writeObject("File" + commandAndValue[1] + "doesn't exists in project root directory");
 					break;
 					
 				case "ls":
@@ -111,14 +97,22 @@ public class CommandHandler extends Thread {
 					break;
 				
 				case "cd":
-						workingDirectory = workingDirectory + "\\" + commandAndValue[1];
-			 			break;
-				case "cd..":
-					   int index = workingDirectory.lastIndexOf('\\');
-					   workingDirectory = workingDirectory.substring(0,index);
-			 			break;
+						if(commandAndValue[1].equals(".."))
+						{
+            System.out.println("Inside cd..");
+							int index = workingDirectory.lastIndexOf('/');
+						    workingDirectory = workingDirectory.substring(0,index);
+						    outputStream.writeObject("changing working directory");
+						}
+						else{
+							workingDirectory = workingDirectory + "/" + commandAndValue[1];
+							outputStream.writeObject("changing working directory");
+						}
+						
+					break;
 				case "mkdir":
-					boolean fileCreated = new File(workingDirectory + "\\" + commandAndValue[1]).mkdirs();
+					
+					boolean fileCreated = new File(workingDirectory + "/" + commandAndValue[1]).mkdirs();
 					if(fileCreated)
 						outputStream.writeObject("Directory "+ commandAndValue[1] +" created successfully");
 					else
@@ -131,7 +125,6 @@ public class CommandHandler extends Thread {
 				case "pwd":
 					outputStream.writeObject(workingDirectory);
 					break;
-				
 				default:
 					outputStream.writeObject("-bash: "+ command +" : command not found");
 				
