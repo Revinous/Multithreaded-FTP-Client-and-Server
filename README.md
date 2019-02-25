@@ -2,10 +2,10 @@
 Assignment 2
 
 ### Remaning
-1) get& put&
+1) get& put& (Done)
 2) Mutual Exclusion
-3) Create table for termniate
-4) Implementation of clearing garbage
+3) Create table for termniate (Create table in Server)
+4) Implementation of clearing garbage (Clearing only files and removing locls)
 
 ### Completed
 1) Created Server.java which spawns ServerTPort and ServerNPort
