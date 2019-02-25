@@ -34,10 +34,14 @@ public class ServerTPort extends Thread {
 			  String commandID = 	(String)inputStream.readObject();
 				System.out.println("Terminating Command with ID : " + commandID);
 				
-         System.out.println(processTable.get(1));
-        System.out.println(processTable.get(Integer.parseInt(commandID)));
-				
-				
+     
+        System.out.println("Current State of the command "+processTable.get(Integer.parseInt(commandID)));
+			  System.out.println("Setting State of the command to terminate");
+        String terminateFlag = "terminate ".concat(processTable.get(Integer.parseInt(commandID)));
+				processTable.put(Integer.parseInt(commandID),terminateFlag); // change state to terminate (add word terminate)
+        System.out.println("Now State of the command "+processTable.get(Integer.parseInt(commandID)));
+        
+        
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

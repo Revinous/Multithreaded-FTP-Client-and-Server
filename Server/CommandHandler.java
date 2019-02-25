@@ -47,7 +47,7 @@ public class CommandHandler extends Thread {
 				switch(commandAndValue[0]) {
 				
 				case "get" : //Server send file to client
-          processTable.put(commandId, "Running" + command); //1 is running
+          processTable.put(commandId, "Running " + command); //1 is running
           outputStream.writeObject(String.valueOf(commandId++));
 					File myfile = new File(workingDirectory+"/"+commandAndValue[1]);
 					byte[] arr = new byte[(int)myfile.length()];
@@ -63,7 +63,7 @@ public class CommandHandler extends Thread {
 					break;
 					
 				case "put" ://Server recieves file from client
-          processTable.put(commandId, "Running" + command); //1 is running
+          processTable.put(commandId, "Running " + command); //1 is running
           outputStream.writeObject(String.valueOf(commandId++));
 				//	System.out.println("wait1");
 					arr = new byte[inputStream.readInt()];
