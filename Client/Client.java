@@ -75,7 +75,7 @@ public class Client {
 					//Relay on tPort
 					Socket socketTerminate = new Socket("127.0.0.1", tPort);
 					ObjectOutputStream outputStreamTerminate = new  ObjectOutputStream(socketTerminate.getOutputStream());
-					outputStreamTerminate.writeObject("terminate");
+					outputStreamTerminate.writeObject(commandAndValue[1]);
 					socketTerminate.close();
 					//also kill thread executing get& or put& and clear all garbage
 					
