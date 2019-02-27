@@ -39,13 +39,37 @@ public class AmpersandHandler implements Runnable {
 				//Thread.sleep(10000);
 			     commandId = (String) inputStream.readObject();
 			    System.out.println("Thread Running in Background. Please use the following CommandID to terminate the command : "+commandId);
-					
-					byte[] arr = new byte[inputStream.readInt()];
-					FileOutputStream fos = new FileOutputStream(commandAndValue[1]);
-					BufferedOutputStream bos = new BufferedOutputStream(fos);
-					
-					inputStream.read(arr,0,arr.length);
-					bos.write(arr,0,arr.length);
+				System.out.println("wait1");
+				int length=inputStream.readInt();
+				byte[] a = new byte[length];
+				int counter=0;
+				int rem=length%1000;
+				int limit=length-rem;
+				FileOutputStream fos = new FileOutputStream(commandAndValue[1]);
+				BufferedOutputStream bos = new BufferedOutputStream(fos);
+				if(length>=1000)
+				{
+					while(counter<limit)
+					{
+						inputStream.read(a,counter,1000);
+						counter+=1000;
+					}
+					if(rem!=0)
+					{
+						inputStream.read(a,counter,rem);
+					}
+				}					
+				else
+				{
+					inputStream.read(a,counter,length);
+				}
+					bos.write(a,0,a.length);
+//					byte[] arr = new byte[inputStream.readInt()];
+//					FileOutputStream fos = new FileOutputStream(commandAndValue[1]);
+//					BufferedOutputStream bos = new BufferedOutputStream(fos);
+//					
+//					inputStream.read(arr,0,arr.length);
+//					bos.write(arr,0,arr.length);
 				
 					
 					bos.close();
@@ -60,13 +84,39 @@ public class AmpersandHandler implements Runnable {
 					//2) Receive CommandId from Server
 					commandId = (String) inputStream.readObject();
 					System.out.println("Thread Running in Background. Please use the following CommandID to terminate the command : "+commandId);
-					
 					File myfile = new File(commandAndValue[1]);
-					arr = new byte[(int)myfile.length()];
+					length=(int) myfile.length();
+					counter=0;
+					a = new byte[length];
+					rem=length%1000;
+					limit=length-rem;
 					BufferedInputStream br = new BufferedInputStream(new FileInputStream(myfile));
-					br.read(arr,0,arr.length);
-					outputStream.writeInt((int)myfile.length());
-					outputStream.write(arr,0,arr.length);	
+					br.read(a,0,a.length);
+					outputStream.writeInt(length);
+					if(length>=1000)
+					{
+						while(counter<limit)
+						{
+							outputStream.write(a,counter,1000);
+							counter+=1000;
+							outputStream.flush();
+						}
+						if(rem!=0)
+						{
+							outputStream.write(a,counter,rem);
+						}
+					}					
+					else
+					{
+						outputStream.write(a,counter,length);
+					}
+					
+//					File myfile = new File(commandAndValue[1]);
+//					arr = new byte[(int)myfile.length()];
+//					BufferedInputStream br = new BufferedInputStream(new FileInputStream(myfile));
+//					br.read(arr,0,arr.length);
+//					outputStream.writeInt((int)myfile.length());
+//					outputStream.write(arr,0,arr.length);	
 					
 					br.close();
 					outputStream.flush();

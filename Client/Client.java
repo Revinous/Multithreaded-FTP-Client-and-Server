@@ -64,6 +64,7 @@ public class Client {
 	
 				case "get&":
 				case "put&":
+					
 					AmpersandHandler runnable = new AmpersandHandler(input, nPort);
 					Thread thread = new Thread(runnable,"thread");
 					thread.start();
