@@ -4,9 +4,20 @@ Assignment 2
 ### Remaning
 
 1) Mutual Exclusion
-2) Implementation of clearing garbage (Clearing only files and removing locls)
-3) Check afer 1000B if command terminated
-4) Working on different systems get& put& don't work
+
+### Current Issues
+1) Sometime on quiting getting error after quit command :
+java.io.EOFException
+        at java.io.ObjectInputStream$BlockDataInputStream.peekByte(ObjectInputStream.java:2959)
+        at java.io.ObjectInputStream.readObject0(ObjectInputStream.java:1539)
+        at java.io.ObjectInputStream.readObject(ObjectInputStream.java:430)
+        at CommandHandler.run(CommandHandler.java:30)
+2) get&, put&, get, put not working on different systems: Getting same error:
+java.io.EOFException
+        at java.io.ObjectInputStream$BlockDataInputStream.peekByte(ObjectInputStream.java:2959)
+        at java.io.ObjectInputStream.readObject0(ObjectInputStream.java:1539)
+        at java.io.ObjectInputStream.readObject(ObjectInputStream.java:430)
+        at CommandHandler.run(CommandHandler.java:30)
 
 ### Completed
 1) Created Server.java which spawns ServerTPort and ServerNPort
@@ -15,6 +26,8 @@ Assignment 2
 4) on terminate command, client relaying with ServerTPort
 5) get& put&
 6) Create table for termniate (Create table in Server)
+7) Implementation of clearing garbage (Clearing only files)
+8) Check afer 1000B if command terminated
 
 ## Installation
 
