@@ -16,7 +16,6 @@ public class CommandHandler extends Thread {
 		clientNo = count;
 		this.tPort = tPort;
 		this.processTable = processTable;
-		commandId = 1;
 		workingDirectory = System.getProperty("user.dir");//curemt workimg dirctory
 	}
 	@Override
@@ -47,8 +46,11 @@ public class CommandHandler extends Thread {
 				switch(commandAndValue[0]) {
 				
 				case "get" : //Server send file to client
+          boolean terminated = false;
+          int commandId = processTable.size() + 100 + 1;
 					processTable.put(commandId, "Running " + command); //1 is running
-					outputStream.writeObject(String.valueOf(commandId++));
+					outputStream.writeObject(String.valueOf(commandId));
+   
 					File myfile = new File(commandAndValue[1]);
 					int length=(int) myfile.length();
 					int counter=0;
@@ -62,14 +64,29 @@ public class CommandHandler extends Thread {
 					{
 						while(counter<limit)
 						{
-							outputStream.write(a,counter,1000);
+              String state = processTable.get(Integer.parseInt( String.valueOf(commandId)));
+              if(state.contains("terminate"))
+                terminated = true;
+              
+             
+							if(terminated)
+                 outputStream.writeObject("terminated"); 
+              else
+               outputStream.writeObject("Still Runnuing");
+               
+               
+              outputStream.write(a,counter,1000);
 							counter+=1000;
 							outputStream.flush();
 						}
-						if(rem!=0)
+            if(terminated){
+              	 System.out.println("Process with coomand Id " + commandId + " terminated by user");
+            }
+            else if(rem!=0)
 						{
 							outputStream.write(a,counter,rem);
 						}
+            
 					}					
 					else
 					{
@@ -87,26 +104,52 @@ public class CommandHandler extends Thread {
 					
 					outputStream.flush();
 					br.close();
+            System.out.println("End");
 					break;
 					
 				case "put" ://Server recieves file from client
-					processTable.put(commandId, "Running " + command); //1 is running
-					outputStream.writeObject(String.valueOf(commandId++));
-					int l=inputStream.readInt();
+           terminated = false;
+        commandId = processTable.size() + 100 + 1;
+        processTable.put(commandId, "Running " + command); //1 is running
+				outputStream.writeObject(String.valueOf(commandId));
+        System.out.println("lengthbefore");
+          int l=inputStream.readInt();
+              System.out.println(l);
 					a = new byte[l];
 					counter=0;
 					rem=l%1000;
 					limit=l-rem;
 					FileOutputStream fos = new FileOutputStream(commandAndValue[1]);
 					BufferedOutputStream bos = new BufferedOutputStream(fos);
+          outputStream.flush();
 					if(l>=1000)
 					{
+           System.out.println("in first if");
 						while(counter<limit)
 						{
+              String state = processTable.get(Integer.parseInt( String.valueOf(commandId)));
+              if(state.contains("terminate"))
+                terminated = true;
+              
+             
+							if(terminated){
+                outputStream.writeObject("terminated");
+                break;
+              }
+                
+              else
+               outputStream.writeObject("Still Runnuing");
+               
 							inputStream.read(a,counter,1000);
 							counter+=1000;
 						}
-						if(rem!=0)
+            if(terminated){
+                 System.out.println("Process with command Id " + commandId + " terminated by user! Deleting the garbage file creadted during the process..");
+              	 File file = new File(commandAndValue[1]);
+                 file.delete();
+                 
+            }
+						else if(rem!=0)
 						{
 							System.out.println("in if");
 							//counter-=1000;
@@ -116,6 +159,7 @@ public class CommandHandler extends Thread {
 					}					
 					else
 					{
+             System.out.println("in else if");
 						inputStream.read(a,counter,l);
 					}
 				//	System.out.println("wait1");
@@ -128,7 +172,9 @@ public class CommandHandler extends Thread {
 					bos.write(a,0,a.length);
 					bos.close();
 					fos.close();
+          System.out.println("End");
 					break;
+		
 				
 				case "delete":
 					 File file = new File(commandAndValue[1]);

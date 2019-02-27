@@ -3,10 +3,9 @@ import java.util.HashMap;
 
 public class Server {
 	public static HashMap<Integer,String> processTable;
-	
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-   processTable = new HashMap<Integer,String>();
+     processTable = new HashMap<Integer,String>();
 		int nPort = Integer.parseInt(args[0]);
 		int tPort = Integer.parseInt(args[1]);
 		
