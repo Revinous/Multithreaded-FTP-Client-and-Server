@@ -6,6 +6,7 @@ Assignment 2
 1) Mutual Exclusion
 2) Implementation of clearing garbage (Clearing only files and removing locls)
 3) Check afer 1000B if command terminated
+4) Working on different systems get& put& don't work
 
 ### Completed
 1) Created Server.java which spawns ServerTPort and ServerNPort
