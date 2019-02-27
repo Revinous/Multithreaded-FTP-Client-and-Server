@@ -36,10 +36,9 @@ public class AmpersandHandler implements Runnable {
 		switch(commandAndValue[0]) {
 			case "get&"://client receives file from server
           outputStream.writeObject("get "+commandAndValue[1]);
-				//Thread.sleep(10000);
 			     commandId = (String) inputStream.readObject();
 			    System.out.println("Thread Running in Background. Please use the following CommandID to terminate the command : "+commandId);
-				System.out.println("wait1");
+  				boolean terminated = false;
 				int length=inputStream.readInt();
 				byte[] a = new byte[length];
 				int counter=0;
@@ -51,13 +50,26 @@ public class AmpersandHandler implements Runnable {
 				{
 					while(counter<limit)
 					{
-						inputStream.read(a,counter,1000);
+             String state = (String)inputStream.readObject();
+             if(state.contains("terminated"))
+                 terminated = true;
+                 
+             if(terminated)
+               break;
+               
+ 						inputStream.read(a,counter,1000);
 						counter+=1000;
 					}
-					if(rem!=0)
+          if(terminated){
+              	 File file = new File(commandAndValue[1]);
+                 file.delete();
+          }
+          else if(rem!=0)
 					{
 						inputStream.read(a,counter,rem);
 					}
+         
+          
 				}					
 				else
 				{
@@ -79,29 +91,45 @@ public class AmpersandHandler implements Runnable {
 				break;
 	
 			case "put&"://client sends file to server
-					//1) Send Command to Server
+      terminated = false;
+				//1) Send Command to Server
 					outputStream.writeObject("put "+commandAndValue[1]);
 					//2) Receive CommandId from Server
 					commandId = (String) inputStream.readObject();
-					System.out.println("Thread Running in Background. Please use the following CommandID to terminate the command : "+commandId);
+					  System.out.println("Thread Running in Background. Please use the following CommandID to terminate the command : "+commandId);
 					File myfile = new File(commandAndValue[1]);
 					length=(int) myfile.length();
-					counter=0;
+           System.out.println("writing length");
+           outputStream.writeInt(length);
+					System.out.println("written length");
+          counter=0;
 					a = new byte[length];
 					rem=length%1000;
 					limit=length-rem;
 					BufferedInputStream br = new BufferedInputStream(new FileInputStream(myfile));
 					br.read(a,0,a.length);
-					outputStream.writeInt(length);
+					
+           outputStream.flush();
 					if(length>=1000)
 					{
 						while(counter<limit)
 						{
+             String state = (String)inputStream.readObject();
+             if(state.contains("terminated"))
+               terminated = true;
+             
+             if(terminated)
+               break;
+               
 							outputStream.write(a,counter,1000);
 							counter+=1000;
 							outputStream.flush();
 						}
-						if(rem!=0)
+            if(terminated)
+            {
+              System.out.println("Put Operation Terminated by user!");
+            }
+						else if(rem!=0)
 						{
 							outputStream.write(a,counter,rem);
 						}
