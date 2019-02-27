@@ -47,32 +47,85 @@ public class CommandHandler extends Thread {
 				switch(commandAndValue[0]) {
 				
 				case "get" : //Server send file to client
-          processTable.put(commandId, "Running " + command); //1 is running
-          outputStream.writeObject(String.valueOf(commandId++));
-					File myfile = new File(workingDirectory+"/"+commandAndValue[1]);
-					byte[] arr = new byte[(int)myfile.length()];
-					
+					processTable.put(commandId, "Running " + command); //1 is running
+					outputStream.writeObject(String.valueOf(commandId++));
+					File myfile = new File(commandAndValue[1]);
+					int length=(int) myfile.length();
+					int counter=0;
+					byte[] a = new byte[length];
+					int rem=length%1000;
+					int limit=length-rem;
 					BufferedInputStream br = new BufferedInputStream(new FileInputStream(myfile));
-					br.read(arr,0,arr.length);
-				//	System.out.println(arr.length);
-					outputStream.writeInt((int)myfile.length());
-					outputStream.write(arr,0,arr.length);	
+					br.read(a,0,a.length);
+					outputStream.writeInt(length);
+					if(length>=1000)
+					{
+						while(counter<limit)
+						{
+							outputStream.write(a,counter,1000);
+							counter+=1000;
+							outputStream.flush();
+						}
+						if(rem!=0)
+						{
+							outputStream.write(a,counter,rem);
+						}
+					}					
+					else
+					{
+						outputStream.write(a,counter,length);
+					}
+					
+//					File myfile = new File(workingDirectory+"/"+commandAndValue[1]);
+//					byte[] arr = new byte[(int)myfile.length()];
+//					
+//					BufferedInputStream br = new BufferedInputStream(new FileInputStream(myfile));
+//					br.read(arr,0,arr.length);
+//				//	System.out.println(arr.length);
+//					outputStream.writeInt((int)myfile.length());
+//					outputStream.write(arr,0,arr.length);	
 					
 					outputStream.flush();
 					br.close();
 					break;
 					
 				case "put" ://Server recieves file from client
-          processTable.put(commandId, "Running " + command); //1 is running
-          outputStream.writeObject(String.valueOf(commandId++));
-				//	System.out.println("wait1");
-					arr = new byte[inputStream.readInt()];
-					
+					processTable.put(commandId, "Running " + command); //1 is running
+					outputStream.writeObject(String.valueOf(commandId++));
+					int l=inputStream.readInt();
+					a = new byte[l];
+					counter=0;
+					rem=l%1000;
+					limit=l-rem;
 					FileOutputStream fos = new FileOutputStream(commandAndValue[1]);
 					BufferedOutputStream bos = new BufferedOutputStream(fos);
-					
-					inputStream.read(arr,0,arr.length);
-					bos.write(arr,0,arr.length);
+					if(l>=1000)
+					{
+						while(counter<limit)
+						{
+							inputStream.read(a,counter,1000);
+							counter+=1000;
+						}
+						if(rem!=0)
+						{
+							System.out.println("in if");
+							//counter-=1000;
+							System.out.println("The value of counter in IF is "+counter);
+							inputStream.read(a,counter,rem);
+						}
+					}					
+					else
+					{
+						inputStream.read(a,counter,l);
+					}
+				//	System.out.println("wait1");
+//					arr = new byte[inputStream.readInt()];
+//					
+//					FileOutputStream fos = new FileOutputStream(commandAndValue[1]);
+//					BufferedOutputStream bos = new BufferedOutputStream(fos);
+//					
+//					inputStream.read(arr,0,arr.length);
+					bos.write(a,0,a.length);
 					bos.close();
 					fos.close();
 					break;
