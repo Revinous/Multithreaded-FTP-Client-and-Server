@@ -1,8 +1,10 @@
 import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
-import java.util.HashMap;
-
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.*;
+import java.util.*;
+ 
 public class CommandHandler extends Thread {
 	 Socket socket;
 	 int clientNo;	
@@ -50,7 +52,7 @@ public class CommandHandler extends Thread {
           int commandId = processTable.size() + 100 + 1;
 					processTable.put(commandId, "Running " + command); //1 is running
 					outputStream.writeObject(String.valueOf(commandId));
-   
+           
 					File myfile = new File(commandAndValue[1]);
 					int length=(int) myfile.length();
 					int counter=0;
@@ -58,7 +60,14 @@ public class CommandHandler extends Thread {
 					int rem=length%1000;
 					int limit=length-rem;
 					BufferedInputStream br = new BufferedInputStream(new FileInputStream(myfile));
-					br.read(a,0,a.length);
+			
+      	
+              br.read(a,0,a.length); 
+             	br.close();
+              sleep(1);
+          
+        /*********Lock ends*****************************************************/
+        
 					outputStream.writeInt(length);
 					if(length>=1000)
 					{
@@ -93,22 +102,48 @@ public class CommandHandler extends Thread {
 						outputStream.write(a,counter,length);
 					}
 					
-//					File myfile = new File(workingDirectory+"/"+commandAndValue[1]);
-//					byte[] arr = new byte[(int)myfile.length()];
-//					
-//					BufferedInputStream br = new BufferedInputStream(new FileInputStream(myfile));
-//					br.read(arr,0,arr.length);
-//				//	System.out.println(arr.length);
-//					outputStream.writeInt((int)myfile.length());
-//					outputStream.write(arr,0,arr.length);	
-					
 					outputStream.flush();
-					br.close();
+				
             System.out.println("End");
+            processTable.put(commandId, "Finished " + command); //1 is running
 					break;
 					
 				case "put" ://Server recieves file from client
-           terminated = false;
+         /*********Write Lock when file is write from server to array********/
+         while(true){
+         
+           List<String> processes = new ArrayList<>();
+           processes.addAll(Server.processTable.values());
+           boolean parrallelProcessRunning = false;
+           for(String process : processes)
+           {
+           
+          
+              if(process.equals("Running " + command))
+                  parrallelProcessRunning = true;
+              
+           }
+           if(!parrallelProcessRunning){
+               
+             System.out.println("Now full-filling new request of client : "+clientNo);
+              break;
+           }
+            
+           Thread.sleep(10000);
+              System.out.println("put request on same file. Client "+clientNo+" need to wait till other request is full-filled");
+          /*
+           1) Reterive values from hashmap
+           2) check if there is matching command with the current command
+           3) If there is a matching command, then find it is Running or Finished
+           4) If running, then wait else continue
+                     
+          */
+          
+         }
+         
+          /*********Write Lock when file is write from server to array********/
+     
+        terminated = false;
         commandId = processTable.size() + 100 + 1;
         processTable.put(commandId, "Running " + command); //1 is running
 				outputStream.writeObject(String.valueOf(commandId));
@@ -119,6 +154,8 @@ public class CommandHandler extends Thread {
 					counter=0;
 					rem=l%1000;
 					limit=l-rem;
+        
+         
 					FileOutputStream fos = new FileOutputStream(commandAndValue[1]);
 					BufferedOutputStream bos = new BufferedOutputStream(fos);
           outputStream.flush();
@@ -162,18 +199,19 @@ public class CommandHandler extends Thread {
              System.out.println("in else if");
 						inputStream.read(a,counter,l);
 					}
-				//	System.out.println("wait1");
-//					arr = new byte[inputStream.readInt()];
-//					
-//					FileOutputStream fos = new FileOutputStream(commandAndValue[1]);
-//					BufferedOutputStream bos = new BufferedOutputStream(fos);
-//					
-//					inputStream.read(arr,0,arr.length);
 					bos.write(a,0,a.length);
 					bos.close();
 					fos.close();
+        
+       
+       
+         /*********Write Lock Ends********/
           System.out.println("End");
+          processTable.put(commandId, "Finished " + command); //1 is running
+          System.out.println("Now State of the command "+processTable.get(commandId));
 					break;
+             
+   
 		
 				
 				case "delete":

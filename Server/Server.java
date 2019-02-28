@@ -1,8 +1,10 @@
 import java.io.IOException;
 import java.util.HashMap;
-
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.*;
 public class Server {
 	public static HashMap<Integer,String> processTable;
+  public static ReentrantLock lock = new ReentrantLock();
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
      processTable = new HashMap<Integer,String>();
