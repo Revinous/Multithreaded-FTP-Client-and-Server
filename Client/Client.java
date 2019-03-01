@@ -170,6 +170,8 @@ public class Client {
 					System.out.println(message);
 					if(message.equals("quit")) {
 						System.out.println("GoodBye!");
+    		  outputStream.close();
+		    	inputStream.close();
 						socket.close();
 					}
 			}
