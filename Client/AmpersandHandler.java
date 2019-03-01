@@ -99,9 +99,9 @@ public class AmpersandHandler implements Runnable {
 					  System.out.println("Thread Running in Background. Please use the following CommandID to terminate the command : "+commandId);
 					File myfile = new File(commandAndValue[1]);
 					length=(int) myfile.length();
-           System.out.println("writing length");
+           //System.out.println("writing length");
            outputStream.writeInt(length);
-					System.out.println("written length");
+					//System.out.println("written length");
           counter=0;
 					a = new byte[length];
 					rem=length%1000;
