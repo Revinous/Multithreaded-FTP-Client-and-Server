@@ -92,9 +92,8 @@ public class Client {
 					System.out.println("CommandID, Terminate not allowed: "+commandId);
 					File myfile = new File(commandAndValue[1]);
 					length=(int) myfile.length();
-           System.out.println("writing length");
+           System.out.println("*Termination not allowed as command not appended with &");
            outputStream.writeInt(length);
-					System.out.println("written length");
           counter=0;
 					a = new byte[length];
 					rem=length%1000;
@@ -164,6 +163,7 @@ public class Client {
 					
 					//..logic yet to be implemented
 				break;
+
 				default:
 					outputStream.writeObject(input);
 					 String message = (String) inputStream.readObject();
@@ -177,8 +177,8 @@ public class Client {
 			}
 					
 		}
-			outputStream.close();
-			inputStream.close();
+			//outputStream.close();
+			//inputStream.close();
 			Thread.sleep(1);
 		
 			
