@@ -52,7 +52,7 @@ public class CommandHandler extends Thread {
           int commandId = processTable.size() + 100 + 1;
 					processTable.put(commandId, "Running " + command); //1 is running
 					outputStream.writeObject(String.valueOf(commandId));
-           
+     Thread.sleep(10000);
 					File myfile = new File(commandAndValue[1]);
 					int length=(int) myfile.length();
 					int counter=0;
