@@ -48,7 +48,10 @@ public class ServerTPort extends Thread {
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}	
+			} catch (NumberFormatException e){
+        e.printStackTrace();
+      }	
+      
 			System.out.println("Client" + count +"connected");
 			
 	
