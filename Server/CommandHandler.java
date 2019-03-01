@@ -33,12 +33,14 @@ public class CommandHandler extends Thread {
 		
 				String[] commandAndValue = command.split(" ");
 				if(commandAndValue[0].equals("quit")) {
-					
+					System.out.println("Client disconnected");
 					 outputStream.writeObject("quit");
 					 inputStream.close();
+          outputStream.flush();
 					 outputStream.close();
 					 socket.close();
-					 break;
+          return;
+					 
 				}
 					
 				System.out.println("command recieved - > at client no ->"+clientNo + " - > " + command);
@@ -48,10 +50,43 @@ public class CommandHandler extends Thread {
 				switch(commandAndValue[0]) {
 				
 				case "get" : //Server send file to client
-          boolean terminated = false;
-          int commandId = processTable.size() + 100 + 1;
-					processTable.put(commandId, "Running " + command); //1 is running
+         int commandId = processTable.size() + 100 + 1;
+					processTable.put(commandId, "Halted " + command); //1 is running
 					outputStream.writeObject(String.valueOf(commandId));
+    while(true){
+         
+           List<String> processes = new ArrayList<>();
+           processes.addAll(Server.processTable.values());
+           boolean parrallelProcessRunning = false;
+           for(String process : processes)
+           {
+               
+              if(process.equals("Running put " + commandAndValue[1]))
+                  parrallelProcessRunning = true;
+              
+           }
+           if(!parrallelProcessRunning){
+               
+             System.out.println("Now full-filling new request of client : "+clientNo);
+              break;
+           }
+           System.out.println("Client "+clientNo+" need to wait to GET the file" + commandAndValue[1] + ". As PUT operation is in progress on the same file.");
+           Thread.sleep(10000);
+             
+          /*
+           1) Reterive values from hashmap
+           2) check if there is put command with the current get command on the same file
+           3) If there is a matching command, then find it is Running or Finished
+           4) If running, then wait else continue
+                     
+          */
+          
+         }
+         
+          boolean terminated = false;
+         // int commandId = processTable.size() + 100 + 1;
+					processTable.put(commandId, "Running " + command); //1 is running
+					//outputStream.writeObject(String.valueOf(commandId));
      Thread.sleep(10000);
 					File myfile = new File(commandAndValue[1]);
 					int length=(int) myfile.length();
@@ -104,11 +139,14 @@ public class CommandHandler extends Thread {
 					
 					outputStream.flush();
 				
-            System.out.println("End");
+            System.out.println("Finished" + command);
             processTable.put(commandId, "Finished " + command); //1 is running
 					break;
 					
 				case "put" ://Server recieves file from client
+        commandId = processTable.size() + 100 + 1;
+       	outputStream.writeObject(String.valueOf(commandId));
+        processTable.put(commandId, "Halted " + command); //1 is running
          /*********Write Lock when file is write from server to array********/
          while(true){
          
@@ -128,9 +166,9 @@ public class CommandHandler extends Thread {
              System.out.println("Now full-filling new request of client : "+clientNo);
               break;
            }
-            
+           System.out.println("PUT request on same file. Client "+clientNo+" need to wait till other request is full-filled");
            Thread.sleep(10000);
-              System.out.println("put request on same file. Client "+clientNo+" need to wait till other request is full-filled");
+             
           /*
            1) Reterive values from hashmap
            2) check if there is matching command with the current command
@@ -144,12 +182,12 @@ public class CommandHandler extends Thread {
           /*********Write Lock when file is write from server to array********/
      
         terminated = false;
-        commandId = processTable.size() + 100 + 1;
+        
         processTable.put(commandId, "Running " + command); //1 is running
-				outputStream.writeObject(String.valueOf(commandId));
-        System.out.println("lengthbefore");
+			
+        //System.out.println("lengthbefore");
           int l=inputStream.readInt();
-              System.out.println(l);
+          //    System.out.println(l);
 					a = new byte[l];
 					counter=0;
 					rem=l%1000;
@@ -161,7 +199,7 @@ public class CommandHandler extends Thread {
           outputStream.flush();
 					if(l>=1000)
 					{
-           System.out.println("in first if");
+         //  System.out.println("in first if");
 						while(counter<limit)
 						{
               String state = processTable.get(Integer.parseInt( String.valueOf(commandId)));
@@ -188,9 +226,9 @@ public class CommandHandler extends Thread {
             }
 						else if(rem!=0)
 						{
-							System.out.println("in if");
+							//System.out.println("in if");
 							//counter-=1000;
-							System.out.println("The value of counter in IF is "+counter);
+						//	System.out.println("The value of counter in IF is "+counter);
 							inputStream.read(a,counter,rem);
 						}
 					}					
@@ -206,7 +244,7 @@ public class CommandHandler extends Thread {
        
        
          /*********Write Lock Ends********/
-          System.out.println("End");
+           System.out.println("Finished ->" + command);
           processTable.put(commandId, "Finished " + command); //1 is running
           System.out.println("Now State of the command "+processTable.get(commandId));
 					break;
@@ -264,6 +302,7 @@ public class CommandHandler extends Thread {
 				case "pwd":
 					outputStream.writeObject(workingDirectory);
 					break;
+        
 				default:
 					outputStream.writeObject("-bash: "+ command +" : command not found");
 				
@@ -277,7 +316,8 @@ public class CommandHandler extends Thread {
 		
 		}
 		catch(Exception e) {
-				e.printStackTrace();
+				System.out.println("exiting");
+        
 			}
 		}
 	}
