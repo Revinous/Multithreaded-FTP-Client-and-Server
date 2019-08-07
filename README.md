@@ -1,9 +1,8 @@
-# distributed-system-2
-Assignment 2
+# Multithreaded FTP Client and Server
+
 
 ### Remaning
-
-1) Mutual Exclusion
+None
 
 ### Current Issues
 1) Sometime on quiting getting error after quit command :
